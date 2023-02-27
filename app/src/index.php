@@ -1,155 +1,176 @@
-<?php 
-    ini_set('max_execution_time', '300');
-    set_time_limit(300);
-function bg()
-{
-  $create_file_update = fopen("/var/www/html/update.txt", "w") or die("Unable to open file!");
-  $txt = '1';
-  fwrite($create_file_update, $txt);
-  $read_file = file_get_contents('/var/www/html/update.txt');
-  if($read_file == '1'){
-    while($read_file == '1'){
-      $read_file = file_get_contents('/var/www/html/update.txt');
-      if($read_file == '1'){
-      flush();
-      }else{
-      $url = $_SERVER['REQUEST_URI'];
-      $url_stripped = str_replace("?update", "", $url);
-      echo "<script>window.location = '$url_stripped'</script>";
-      }
-    }
-  }
-}
-?>
-<html>
-    <head>
-    <title>Docker Updates</title>
-    <link rel="stylesheet" href="style.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?php
+            if (isset($_ENV['WINDOW_TITLE'])) {
+                echo htmlspecialchars($_ENV['WINDOW_TITLE']);
+            } else {
+                echo 'Dockcheck';
+            }
+            ?></title>
+    <link rel="stylesheet" href="bulma.min.css">
     <link rel="icon" href="favico.jpeg">
-    </head>
+</head>
 <body>
-<?php
-?>
-<div class="content">
-<h1><a href=index.php>Dockcheck</a></h1>
-<?php
-if(isset($_GET['update'])){
-  unset($_GET['update']);
-  echo "<div class=\"loading-container\">
-  <div class=\"loading\"></div>
-  <div id=\"loading-text\">loading</div>
-  </div>";
-  echo "This might take a while, it depends on how many containers are running";
-  bg();
-}
-?>
-<header>
-  <h1><a href=index.php?update>Check for updates</a></h1>
-</header>
-<?
-$filename = '/app/containers';
-$f = fopen($filename, 'r');
+<section class="section">
 
-if ($f) {
-    $contents = fread($f, filesize($filename));
-    fclose($f);
-    preg_match("/(?<=Containers with errors, wont get updated:\n)(?s).*?(?=\n\n)/", $contents, $conerror_match); 
-    $string_output_error = implode('', $conerror_match);
-    $conerror_match = preg_split('`\n`', $string_output_error);
+    <div class="container">
+        <h1 class="title">
+            <a href=index.php><?php
+                if (isset($_ENV['PAGE_TITLE'])) {
+                    echo htmlspecialchars($_ENV['PAGE_TITLE']);
+                } else {
+                    echo 'Dockcheck';
+                }
+                ?>
+            </a>
+        </h1>
+        <h2 class="subtitle">Image updates for your running containers.</h2>
+    </div>
 
-    preg_match("/(?<=Containers on latest version:\n)(?s).*?(?=\n\n)/", $contents, $conlatest_match);    
-    $string_output_latest = implode('', $conlatest_match);
-    $conlatest_match = preg_split('`\n`', $string_output_latest);
+    <div class="container">
+        <p>&nbsp;</p>
+        <p><button id="cfu" type="button" class="button is-primary is-rounded">Check for updates</button></p>
+        <p>&nbsp;</p>
+    </div>
 
-    preg_match("/(?<=Containers with updates available:\n)(?s).*?(?=\n\n)/", $contents, $conupdate_match);
-    $string_output_update = implode('', $conupdate_match);
-    $conupdate_match = preg_split('`\n`', $string_output_update);
-}
+    <div class="container">
+    <?
+    $filename = '/data/containers';
+
+    $conlatest_match = [];
+    $conerror_match = [];
+    $conupdate_match = [];
+
+    if (filesize($filename) != 0) {
+
+        $f = fopen($filename, 'r');
+
+        if ($f) {
+            $contents = fread($f, filesize($filename));
+            fclose($f);
+            preg_match("/(?<=Containers with errors, wont get updated:\n)(?s).*?(?=\n\n)/", $contents, $conerror_match); 
+            $string_output_error = implode('', $conerror_match);
+            $conerror_match = preg_split('`\n`', $string_output_error);
+
+            preg_match("/(?<=Containers on latest version:\n)(?s).*?(?=\n\n)/", $contents, $conlatest_match);    
+            $string_output_latest = implode('', $conlatest_match);
+            $conlatest_match = preg_split('`\n`', $string_output_latest);
+
+            preg_match("/(?<=Containers with updates available:\n)(?s).*?(?=\n\n)/", $contents, $conupdate_match);
+            $string_output_update = implode('', $conupdate_match);
+            $conupdate_match = preg_split('`\n`', $string_output_update);
+        }
 
 
-$keyslatest = array_keys($conlatest_match);
-$arraysizelatest = count($conlatest_match); 
+        $keyslatest = array_keys($conlatest_match);
+        $arraysizelatest = count($conlatest_match); 
 
-$keyserror = array_keys($conerror_match);
-$arraysizeerror = count($conerror_match);
+        $keyserror = array_keys($conerror_match);
+        $arraysizeerror = count($conerror_match);
 
 
-$keysupdate = array_keys($conupdate_match);
-$arraysizeupdate = count($conupdate_match);
+        $keysupdate = array_keys($conupdate_match);
+        $arraysizeupdate = count($conupdate_match);
+    }
 
-?>
-<div class="row">
-  <div class="column">
-    <table>
-      <tr>
-        <th class="latest">Containers on latest version:</th>
-        <th></th>
-        <th></th>
-      </tr>
-      <?php
-       sort($conlatest_match);
-      if(!empty($conlatest_match)) {
-            for($i=0; $i < $arraysizelatest; $i++) {
-                echo '<tr>';
-                echo '<td>' . $conlatest_match[$keyslatest[$i]] . '</td>';
-                echo '<td></td>';
-                echo '<td></td>';
-                echo '</tr>';
+
+
+    ?>
+    <div class="columns">
+        <div class="column">
+            <span class="title is-size-4 has-text-success is-capitalized">Updates available</span>
+            <table class="table is-narrow">
+            <?php
+            sort($conupdate_match);
+            if(!empty($conupdate_match)) {
+                    for($i=0; $i < $arraysizeupdate; $i++) {
+                        echo '<tr>';
+                        echo '<td>' . $conupdate_match[$keysupdate[$i]] . '</td>';
+                        echo '</tr>';
+                    }
             }
-      }
-        ?>
-    </table>
-  </div>
-  <div class="column">
-    <table>
-      <tr>
-        <th class="update">Containers with updates available:</th>
-        <th></th>
-        <th></th>
-      </tr>
-      <?php
-       sort($conupdate_match);
-      if(!empty($conupdate_match)) {
-            for($i=0; $i < $arraysizeupdate; $i++) {
-                echo '<tr>';
-                echo '<td>' . $conupdate_match[$keysupdate[$i]] . '</td>';
-                echo '<td></td>';
-                echo '<td></td>';
-                echo '</tr>';
+            ?>
+            </table>
+
+        </div>            
+        <div class="column">
+            <span class="title is-size-4 has-text-info is-capitalized">Up-to-date</span>
+            <table class="table is-narrow">
+            <?php
+            sort($conlatest_match);
+            if(!empty($conlatest_match)) {
+                    for($i=0; $i < $arraysizelatest; $i++) {
+                        echo '<tr>';
+                        echo '<td>' . $conlatest_match[$keyslatest[$i]] . '</td>';
+                        echo '</tr>';
+                    }
             }
-      }
-        ?>
-    </table>
+                ?>
+            </table>
+        </div>
 
-  </div>
+        <div class="column">
+            <span class="title is-size-4 has-text-danger is-capitalized">Will not be updated</span>
+            <table class="table is-narrow">
+            <?php
+            sort($conerror_match);
+                if(!empty($conerror_match)) {
+                    for($i=0; $i < $arraysizeerror; $i++) {
+                        echo '<tr>';
+                        echo '<td>' . $conerror_match[$keyserror[$i]] . '</td>';
+                        echo '</tr>';
+                    }
+                }
+                ?>
+            </table>
+        </div>
+    </div>
+</section>
 
-</div>
-<div class="row">
-<div class="error">
-    <hr>
-    <table>
-      <tr>
-        <th class="error">Containers with errors, wont get updated:</th>
-        <th></th>
-        <th></th>
-      </tr>
-      <?php
-       sort($conerror_match);
-        if(!empty($conerror_match)) {
-            for($i=0; $i < $arraysizeerror; $i++) {
-                echo '<tr>';
-                echo '<td>' . $conerror_match[$keyserror[$i]] . '</td>';
-                echo '<td></td>';
-                echo '<td></td>';
-                echo '</tr>';
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Functions to open and close a modal
+  function setLoading($el) {
+    $el.classList.add('is-loading');
+  }
 
+  function endLoading($el) {
+    $el.classList.remove('is-loading');
+  }
+
+  const cfuButton = document.querySelector('#cfu')
+  cfuButton.addEventListener('click', () => {
+      setLoading(cfuButton);
+      fetch('/check.php').then( r => r.text()).then( t => console.log(t))
+      intervalId = window.setInterval(() => {
+        fetch('/status.php')
+        .then( r => r.json())
+        .then( j => {
+            if (!j.running) {
+                location.reload()
+                endLoading(cfuButton)
+                window.clearInterval(intervalId);
             }
-          }
-        ?>
-    </table>
+        })
+      }, 1000);
+    });
 
-  </div>
-</div>
+    fetch('/status.php')
+    .then( r => r.json())
+    .then( j => {
+        if (j.running) {
+            cfuButton.click()
+        }
+    })
+
+
+
+});
+
+</script>
 
 </body>
 </html>
