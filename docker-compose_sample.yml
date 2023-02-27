@@ -2,10 +2,17 @@ version: '3.2'
 services:
   dockcheck-web:
     container_name: dockcheck-web
-    image: 'palleri/dockcheck-web:latest'
+    image: 'ghcr.io/supermamon/dockcheck-web:local'
     restart: unless-stopped
     ports:
-      - '80:80'
+      - '8401:80'
     volumes:
-      - ./data:/var/www/html
+      - ./data:/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PAGE_TITLE=Dockcheck
+      - WINDOW_TITLE=Dockcheck
+      - CHECK_ON_LAUNCH=false
+      - NOTIFY=true
+      - NOTIFY_URLS="slack://sometoken1/sometoken2/sometoken3/"
