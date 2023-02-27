@@ -38,45 +38,18 @@
 
     <div class="container">
     <?
-    $filename = '/data/containers';
 
-    $conlatest_match = [];
-    $conerror_match = [];
-    $conupdate_match = [];
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);    
+    curl_setopt($curl, CURLOPT_URL, 'http://127.0.0.1/updates.php');
+    $res = curl_exec($curl);
+    curl_close($curl);
 
-    if (filesize($filename) != 0) {
-
-        $f = fopen($filename, 'r');
-
-        if ($f) {
-            $contents = fread($f, filesize($filename));
-            fclose($f);
-            preg_match("/(?<=Containers with errors, wont get updated:\n)(?s).*?(?=\n\n)/", $contents, $conerror_match); 
-            $string_output_error = implode('', $conerror_match);
-            $conerror_match = preg_split('`\n`', $string_output_error);
-
-            preg_match("/(?<=Containers on latest version:\n)(?s).*?(?=\n\n)/", $contents, $conlatest_match);    
-            $string_output_latest = implode('', $conlatest_match);
-            $conlatest_match = preg_split('`\n`', $string_output_latest);
-
-            preg_match("/(?<=Containers with updates available:\n)(?s).*?(?=\n\n)/", $contents, $conupdate_match);
-            $string_output_update = implode('', $conupdate_match);
-            $conupdate_match = preg_split('`\n`', $string_output_update);
-        }
-
-
-        $keyslatest = array_keys($conlatest_match);
-        $arraysizelatest = count($conlatest_match); 
-
-        $keyserror = array_keys($conerror_match);
-        $arraysizeerror = count($conerror_match);
-
-
-        $keysupdate = array_keys($conupdate_match);
-        $arraysizeupdate = count($conupdate_match);
-    }
-
-
+    $json = json_decode($res);
 
     ?>
     <div class="columns">
@@ -84,13 +57,15 @@
             <span class="title is-size-4 has-text-success is-capitalized">Updates available</span>
             <table class="table is-narrow">
             <?php
-            sort($conupdate_match);
-            if(!empty($conupdate_match)) {
-                    for($i=0; $i < $arraysizeupdate; $i++) {
-                        echo '<tr>';
-                        echo '<td>' . $conupdate_match[$keysupdate[$i]] . '</td>';
-                        echo '</tr>';
-                    }
+            if ($json->updates->count > 0) {
+                $list = $json->updates->list;
+                sort($list);
+                for($i=0; $i < $json->updates->count; $i++) {
+                    echo '<tr>';
+                    echo '<td>' . $list[$i] . '</td>';
+                    echo '</tr>';
+                }
+
             }
             ?>
             </table>
@@ -100,31 +75,35 @@
             <span class="title is-size-4 has-text-info is-capitalized">Up-to-date</span>
             <table class="table is-narrow">
             <?php
-            sort($conlatest_match);
-            if(!empty($conlatest_match)) {
-                    for($i=0; $i < $arraysizelatest; $i++) {
-                        echo '<tr>';
-                        echo '<td>' . $conlatest_match[$keyslatest[$i]] . '</td>';
-                        echo '</tr>';
-                    }
+            if ($json->latest->count > 0) {
+                $list = $json->latest->list;
+                sort($list);
+                for($i=0; $i < $json->latest->count; $i++) {
+                    echo '<tr>';
+                    echo '<td>' . $list[$i] . '</td>';
+                    echo '</tr>';
+                }
+
             }
-                ?>
+            ?>
             </table>
         </div>
 
         <div class="column">
-            <span class="title is-size-4 has-text-danger is-capitalized">Will not be updated</span>
+            <span class="title is-size-4 has-text-danger is-capitalized">Error Getting Updates</span>
             <table class="table is-narrow">
             <?php
-            sort($conerror_match);
-                if(!empty($conerror_match)) {
-                    for($i=0; $i < $arraysizeerror; $i++) {
-                        echo '<tr>';
-                        echo '<td>' . $conerror_match[$keyserror[$i]] . '</td>';
-                        echo '</tr>';
-                    }
+            if ($json->errors->count > 0) {
+                $list = $json->errors->list;
+                sort($list);
+                for($i=0; $i < $json->errors->count; $i++) {
+                    echo '<tr>';
+                    echo '<td>' . $list[$i] . '</td>';
+                    echo '</tr>';
                 }
-                ?>
+
+            }
+            ?>
             </table>
         </div>
     </div>
