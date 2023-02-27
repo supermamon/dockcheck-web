@@ -42,4 +42,4 @@ RUN cp /app/cron/dockcheck /etc/cron.daily/dockcheck \
 && mkdir /data \
 && echo "0" > /data/containers
 
-ENTRYPOINT ["/app/run.sh", "env"]
+ENTRYPOINT ["/app/entrypoint.sh", "env"]
