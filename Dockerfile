@@ -8,7 +8,7 @@ ARG ARCH
 WORKDIR /app
 
 RUN apt update && apt install cron docker.io inotify-tools pip -y \
-&& curl -sL "https://raw.githubusercontent.com/mag37/dockcheck/main/dockcheck.sh" -o /app/dockcheck.sh \
+&& curl -sL "https://raw.githubusercontent.com/mag37/dockcheck/main/dc_brief.sh" -o /app/dockcheck.sh \
 && rm -rf /etc/cron.daily/* \
 && mkdir -p /var/www/tmp \
 && mkdir -p /var/www/html \
@@ -26,6 +26,7 @@ RUN case ${ARCH} in \
 ENV NOTIFY="" \
 NOTIFY_DEBUG="" \
 NOTIFY_URLS="" \
+EXCLUDE="" \
 CHECK_ON_LAUNCH="true"
 
 COPY app* /app/

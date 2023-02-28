@@ -32,6 +32,7 @@ services:
     environment:
       - NOTIFY=true # optional
       - NOTIFY_URLS=discord://Dockcheck-web@xxxxx/xxxxxx #optional
+      - EXCLUDE=nginx,plex,prowlarr  #optional
       - CHECK_ON_LAUNCH=true # optional
       - PAGE_TITLE=Dockcheck # optional
       - WINDOW_TITLE=Dockcheck #optional
@@ -48,6 +49,7 @@ services:
 | NOTIFY          | false     | Enable notifications                  |
 | NOTIFY_DEBUG    |           | Enable notifications DEBUG mode. Be carefull, your tokens and passwords might be visible in docker logs. | 
 | NOTIFY_URLS     |           | See Notifications section             |
+| EXCLUDE         |           | Exclude containers from update check  |
 | HTTP_PROXY      |           |                                       |
 | HTTPS_PROXY     |           |                                       |
 | CHECK_ON_LAUNCH | true      | Run `dockcheck` when container starts |
