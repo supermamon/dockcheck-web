@@ -1,41 +1,51 @@
 #!/bin/bash
 
-echo "$0 # checking for updates"
-if [ -z "$EXCLUDE" ]; then
+echo "$(date) dockcheck started" >> /var/log/cron.log
+
+source /app/ENV
+
+#echo "* $0 DEBUG EXCLUDE = $EXCLUDE"
+#echo "* $0 DEBUG NOTIFY = $NOTIFY"
+#echo "* $0 DEBUG NOTIFY_URLS = $NOTIFY_URLS"
+#echo "* $0 DEBUG NOTIFY_DEBUG = $NOTIFY_DEBUG"
+
+echo "* $0 checking for updates"
+if [ ! -z "$EXCLUDE" ]; then
     /app/dockcheck.sh -e $EXCLUDE | sed -r "s:\x1B\[[0-9;]*[mK]::g" > /data/containers
 else
     /app/dockcheck.sh | sed -r "s:\x1B\[[0-9;]*[mK]::g" > /data/containers
 fi
 
-echo "$0 # check complete, saving list."
+echo "* $0 check complete, saving list."
 echo "$(date). Cron ran without error." >> /var/log/cron.log
 
-
-NOTIFY_URLS=/app/NOTIFY_URLS
-if [ -f "$NOTIFY_URLS" ]; then
-    NOTIFY_URLS=$(</app/NOTIFY_URLS)
-    grep -oPz '(?<=Containers with updates available:\n)(?s).*(?=\n\n)' /app/containers > /app/notifymsg 
+if [ "$NOTIFY" = "true" ]; then
+if [ ! -z "$NOTIFY_URLS" ]; then
+    grep -oPz '(?<=Containers with updates available:\n)(?s).*(?=\n\n)' /data/containers > /app/notifymsg 
     notifymsg=/app/notifymsg
     
     if [ -s "$notifymsg" ]; then
         
-        NOTIFY_DEBUG=/app/NOTIFY_DEBUG
-        if [ -f "$NOTIFY_DEBUG" ]; then
-
+        if [ "$NOTIFY_DEBUG" = "true" ]; then
+            
             sed -i '1i There is updates available for:' /app/notifymsg
             notifymsg="$(cat /app/notifymsg | tr -d '\0')"
             
-            apprise -vvvv -t "Dockcheck-web Notify" -b "$notifymsg" "$NOTIFY_URLS"
+            apprise -vvvv -t "Dockcheck-web updates on $(hostname)" -b "$notifymsg" "$NOTIFY_URLS"
             rm /app/notifymsg
 
         else
-
+            echo "* $0 sending notification"
             sed -i '1i There is updates available for:' /app/notifymsg
             notifymsg="$(cat /app/notifymsg | tr -d '\0')"
-            apprise -t "Dockcheck-web Notify" -b "$notifymsg" "$NOTIFY_URLS"
+
+#            echo "* $0 DEBUG notifymsg = $notifymsg"
+
+            apprise -t "Dockcheck-web updates on $(hostname)" -b "$notifymsg" "$NOTIFY_URLS"
             rm /app/notifymsg
         fi
     fi
+fi
 fi
 
 if [ $? -eq 0 ]; then echo "$(date). Cron ran without error." >> /var/log/cron.log ; else echo "$(date). Cron got errors." >> /var/log/cron.log ; fi

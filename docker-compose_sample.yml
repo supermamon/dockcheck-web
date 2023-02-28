@@ -15,4 +15,5 @@ services:
       - WINDOW_TITLE=Dockcheck
       - CHECK_ON_LAUNCH=false
       - NOTIFY=true
-      - NOTIFY_URLS="slack://sometoken1/sometoken2/sometoken3/"
+      - NOTIFY_URLS=slack://sometoken1/sometoken2/sometoken3
+      - EXCLUDE=nginx
