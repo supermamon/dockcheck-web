@@ -35,8 +35,6 @@
         <p><button id="cfu" type="button" class="button is-primary is-rounded">Check for updates</button></p>
         <p>&nbsp;</p>
     </div>
-
-    <div class="container">
     <?
 
     $curl = curl_init();
@@ -52,7 +50,24 @@
     $json = json_decode($res);
 
     ?>
+    <div class="container content">
+        <blockquote class="p-2">
+            As of <?php  
+            $timezone = 'UTC';
+            if (isset($_ENV['TZ'])) {
+                $timezone = $_ENV['TZ'];
+            }
+            $epoch = $json->asof;
+            $dt = new DateTime("@$epoch");
+            $dt->setTimezone(new DateTimeZone($timezone));
+            echo $dt->format('j F Y, g:i a');
+            ?>
+        </blockquote>
+    </div>
+
+    <div class="container">
     <div class="columns">
+        
         <div class="column">
             <span class="title is-size-4 has-text-success is-capitalized">Updates available</span>
             <table class="table is-narrow">

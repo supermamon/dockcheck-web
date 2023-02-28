@@ -7,13 +7,14 @@ services:
     ports:
       - '8401:80'
     volumes:
-      - ./data:/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/localtime:ro
+      - ./data:/data
     environment:
-      - PAGE_TITLE=Dockcheck
-      - WINDOW_TITLE=Dockcheck
-      - CHECK_ON_LAUNCH=false
       - NOTIFY=true
       - NOTIFY_URLS=slack://sometoken1/sometoken2/sometoken3
       - EXCLUDE=nginx
+      - PAGE_TITLE=Dockcheck
+      - WINDOW_TITLE=Dockcheck
+      - CHECK_ON_LAUNCH=true
+      - TZ=Europe/London

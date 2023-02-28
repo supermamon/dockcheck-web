@@ -7,12 +7,14 @@ class UpdatesList {
 }
 
 class UpdatesBatch {
+  public $asof;
   public $errors;
   public $latest;
   public $updates; 
 }
 
 $batch = new UpdatesBatch;
+$batch->asof = time();
 $batch->errors = new UpdatesList;
 $batch->latest = new UpdatesList;
 $batch->updates = new UpdatesList;
@@ -28,6 +30,8 @@ if (filesize($filename) != 0) {
     $f = fopen($filename, 'r');
 
     if ($f) {
+        $batch->asof = filemtime($filename);
+
         $contents = fread($f, filesize($filename));
         fclose($f);
         preg_match("/(?<=Containers with errors, wont get updated:\n)(?s).*?(?=\n\n)/", $contents, $conerror_match); 

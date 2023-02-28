@@ -2,7 +2,7 @@
 
 A webpage showing available image updates for your running containers.
 
-![](img/dockcheck-desktop.png)
+![side-by-side desktop and mobile screenshot of dockcheck-web](img/dockcheck-screenshot.png)
 
 ## Forked from [Palleri/dockcheck-web](https://github.com/Palleri/dockcheck-web)
 
@@ -13,7 +13,7 @@ A webpage showing available image updates for your running containers.
 * Mobile-friendly styling using [Bulma](https://bulma.io/)
 * Leaner entrypoint script
 * Customizable page/window titles
-
+* Show last update date/time on page
 
 docker-compose.yml
 ```yml
@@ -36,6 +36,7 @@ services:
       - CHECK_ON_LAUNCH=true # optional
       - PAGE_TITLE=Dockcheck # optional
       - WINDOW_TITLE=Dockcheck #optional
+      - TZ=Europe/London
 ```
 
 ---
@@ -55,6 +56,7 @@ services:
 | CHECK_ON_LAUNCH | true      | Run `dockcheck` when container starts |
 | PAGE_TITLE      | Dockcheck | Custom web page title                 |
 | WINDOW_TITLE    | Dockcheck | Custom window title                   |
+| TZ              |           | Timezone to use for displaying date/time on the page |
 
 ### Volumes
 
