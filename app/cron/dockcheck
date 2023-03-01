@@ -1,51 +1,72 @@
 #!/bin/bash
 
-echo "$(date) dockcheck started" >> /var/log/cron.log
+CRON_LOG=/var/log/cron.log
 
+[ "$DEBUG" = "true" ] && echo "DEBUG: $0 dockcheck starting" 
+echo "$(date) : dockcheck starting" >> $CRON_LOG
+
+# load enviroment variables
 source /app/ENV
 
-#echo "* $0 DEBUG EXCLUDE = $EXCLUDE"
-#echo "* $0 DEBUG NOTIFY = $NOTIFY"
-#echo "* $0 DEBUG NOTIFY_URLS = $NOTIFY_URLS"
-#echo "* $0 DEBUG NOTIFY_DEBUG = $NOTIFY_DEBUG"
+[ "$DEBUG" = "true" ] && echo "DEBUG: $0 EXCLUDE = $EXCLUDE" 
+[ "$DEBUG" = "true" ] && echo "DEBUG: $0 NOTIFY = $NOTIFY" 
+[ "$DEBUG" = "true" ] && echo "DEBUG: $0 NOTIFY_URLS = $NOTIFY_URLS" 
+[ "$DEBUG" = "true" ] && echo "DEBUG: $0 NOTIFY_DEBUG = $NOTIFY_DEBUG" 
 
+# run dockcheck.sh with consideration if exclusions are provided
 echo "* $0 checking for updates"
 if [ ! -z "$EXCLUDE" ]; then
+    [ "$DEBUG" = "true" ] && echo "DEBUG: $0 running dockcheck with exclusions" 
     /app/dockcheck.sh -e $EXCLUDE | sed -r "s:\x1B\[[0-9;]*[mK]::g" > /data/containers
 else
+    [ "$DEBUG" = "true" ] && echo "DEBUG: $0 running dockcheck without exclusions" 
     /app/dockcheck.sh | sed -r "s:\x1B\[[0-9;]*[mK]::g" > /data/containers
 fi
 
-echo "* $0 check complete, saving list."
-echo "$(date). Cron ran without error." >> /var/log/cron.log
+echo "* $0 check complete, list saved."
+[ "$DEBUG" = "true" ] && echo "DEBUG: $0 checking complete" 
+
+echo "$(date) : dockcheck ran without error." >> $CRON_LOG
+
+[ "$DEBUG" = "true" ] && echo "DEBUG: $0 logged to cron" 
 
 if [ "$NOTIFY" = "true" ]; then
-if [ ! -z "$NOTIFY_URLS" ]; then
-    grep -oPz '(?<=Containers with updates available:\n)(?s).*(?=\n\n)' /data/containers > /app/notifymsg 
-    notifymsg=/app/notifymsg
-    
-    if [ -s "$notifymsg" ]; then
+    [ "$DEBUG" = "true" ] && echo "DEBUG: $0 notifications are active." 
+    if [ ! -z "$NOTIFY_URLS" ]; then
+
+        grep -oPz '(?<=Containers with updates available:\n)(?s).*(?=\n\n)' /data/containers > /app/notifymsg 
+        notifymsg=/app/notifymsg
         
-        if [ "$NOTIFY_DEBUG" = "true" ]; then
-            
+        if [ -s "$notifymsg" ]; then
             sed -i '1i There is updates available for:' /app/notifymsg
             notifymsg="$(cat /app/notifymsg | tr -d '\0')"
-            
-            apprise -vvvv -t "Dockcheck-web updates on $(hostname)" -b "$notifymsg" "$NOTIFY_URLS"
+
+            [ "$DEBUG" = "true" ] && echo "DEBUG: $0 sending notification message." 
+            [ "$DEBUG" = "true" ] && echo "DEBUG: $0 notifymsg = $notifymsg" 
+
+            if [ "$DEBUG" = "true" ]; then            
+                apprise -vvvv -t "Dockcheck-web updates on $(hostname)" -b "$notifymsg" "$NOTIFY_URLS"
+            else
+                apprise -t "Dockcheck-web updates on $(hostname)" -b "$notifymsg" "$NOTIFY_URLS"
+            fi
             rm /app/notifymsg
 
+            echo "* $0 notification sent"
         else
-            echo "* $0 sending notification"
-            sed -i '1i There is updates available for:' /app/notifymsg
-            notifymsg="$(cat /app/notifymsg | tr -d '\0')"
-
-#            echo "* $0 DEBUG notifymsg = $notifymsg"
-
-            apprise -t "Dockcheck-web updates on $(hostname)" -b "$notifymsg" "$NOTIFY_URLS"
-            rm /app/notifymsg
+            echo "* $0 nothing to notify about" 
         fi
+    else 
+        echo "* $0 notification method not provided" 
     fi
-fi
+else
+    echo "* $0 notifications not active. skipping."
 fi
 
-if [ $? -eq 0 ]; then echo "$(date). Cron ran without error." >> /var/log/cron.log ; else echo "$(date). Cron got errors." >> /var/log/cron.log ; fi
+if [ $? -eq 0 ]; then 
+    echo "$(date) : dockcheck ran without error." >> $CRON_LOG; 
+else 
+    echo "$(date) : dockcheck encounterred errors." >> $CRON_LOG; 
+fi
+
+[ "$DEBUG" = "true" ] && echo "DEBUG: $0 dockcheck done"
+true
