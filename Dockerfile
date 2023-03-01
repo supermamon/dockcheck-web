@@ -29,7 +29,7 @@ NOTIFY_URLS="" \
 EXCLUDE="" \
 CHECK_ON_LAUNCH="true"
 
-COPY app* /app/
+COPY app /app
 COPY app/src /var/www/html/
 
 VOLUME /data
@@ -38,9 +38,10 @@ RUN cp /app/cron/dockcheck /etc/cron.daily/dockcheck \
 && chmod +x /etc/cron.daily/dockcheck \
 && rm -rf /etc/crontab \
 && cp /app/cron/crontab /etc/crontab \
-&& service cron start \
 && chmod +x /app/watcher.sh \
-&& mkdir /data \
-&& echo "0" > /data/containers
+&& $( [ ! -d "/data" ] && mkdir /data) \
+&& echo "0" > /data/containers \ 
+&& mkdir /data/logs
 
-ENTRYPOINT ["/app/entrypoint.sh", "env"]
+
+ENTRYPOINT ["/app/entrypoint.sh"]
