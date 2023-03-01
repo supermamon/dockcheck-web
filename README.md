@@ -4,7 +4,7 @@ A webpage showing available image updates for your running containers.
 
 ![side-by-side desktop and mobile screenshot of dockcheck-web](img/dockcheck-screenshot.png)
 
-## Forked from [Palleri/dockcheck-web](https://github.com/Palleri/dockcheck-web)
+### Forked from [Palleri/dockcheck-web](https://github.com/Palleri/dockcheck-web)
 
 ## Changes from upstream dockcheck-web
 * Data volume separate from the web app code
@@ -12,8 +12,9 @@ A webpage showing available image updates for your running containers.
 * API endpoints to trigger update check and running state
 * Mobile-friendly styling using [Bulma](https://bulma.io/)
 * Leaner entrypoint script
-* Customizable page/window titles
-* Show last update date/time on page
+* Customizable page/window titles (`PAGE_TITLE`,`WINDOW_TITLE`)
+* Show last update date/time on page (`TZ`)
+* Troubleshooting options (`DEBUG`,`SILENCE_APACHE_LOGS`)
 
 docker-compose.yml
 ```yml
@@ -36,7 +37,7 @@ services:
       - CHECK_ON_LAUNCH=true # optional
       - PAGE_TITLE=Dockcheck # optional
       - WINDOW_TITLE=Dockcheck #optional
-      - TZ=Europe/London
+      - TZ=Europe/London #optional
 ```
 
 ---
@@ -45,18 +46,20 @@ services:
 
 ### Environment Variables
 
-| Variable        | Default   | Description                           |
-| --------------- | --------- | ------------------------------------- |
-| NOTIFY          | false     | Enable notifications                  |
-| NOTIFY_DEBUG    |           | Enable notifications DEBUG mode. Be carefull, your tokens and passwords might be visible in docker logs. | 
-| NOTIFY_URLS     |           | See Notifications section             |
-| EXCLUDE         |           | Exclude containers from update check  |
-| HTTP_PROXY      |           |                                       |
-| HTTPS_PROXY     |           |                                       |
-| CHECK_ON_LAUNCH | true      | Run `dockcheck` when container starts |
-| PAGE_TITLE      | Dockcheck | Custom web page title                 |
-| WINDOW_TITLE    | Dockcheck | Custom window title                   |
-| TZ              |           | Timezone to use for displaying date/time on the page |
+| Variable            | Default   | Description                           |
+| ------------------- | --------- | ------------------------------------- |
+| NOTIFY              | false     | Enable notifications                  |
+| NOTIFY_DEBUG        |           | Enable notifications DEBUG mode. Be careful, your tokens and passwords might be visible in docker logs. | 
+| NOTIFY_URLS         |           | See Notifications section             |
+| EXCLUDE             |           | Exclude containers from update check  |
+| HTTP_PROXY          |           |                                       |
+| HTTPS_PROXY         |           |                                       |
+| CHECK_ON_LAUNCH     | true      | Run `dockcheck` when container starts |
+| PAGE_TITLE          | Dockcheck | Custom web page title                 |
+| WINDOW_TITLE        | Dockcheck | Custom window title                   |
+| TZ                  | UTC       | Timezone to use for displaying date/time on the page |
+| DEBUG               |           | Set to 'true' to show debugging information in docker logs  |
+| SILENCE_APACHE_LOGS |           | Set to 'true' to hide Apache logs     |
 
 ### Volumes
 
@@ -79,7 +82,7 @@ services:
   ...
 ```
 
-### Example for multiple urls
+Example for multiple urls
 
 ```yml
 version: '3.2'
