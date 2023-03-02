@@ -7,12 +7,8 @@ class UpdateStatus {
 
 $status = new UpdateStatus;
 
-$status->running = false;
-$content = file_get_contents('/var/www/html/update.txt');
+$status->running = file_exists('/data/running');
 
-if ($content == '1') {
-    $status->running = true;
-}
 $jsonStr = json_encode($status);
 echo $jsonStr;
 

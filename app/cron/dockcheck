@@ -3,6 +3,17 @@
 CRON_LOG=/var/log/cron.log
 
 [ "$DEBUG" = "true" ] && echo "DEBUG: $0 dockcheck starting" 
+
+
+# temporary file to signal that update is running.
+# either via manual trigger or cron.
+if [ -f "/data/running" ]; then
+    echo "$(date) : check is already in progress" >> $CRON_LOG
+    echo "* $0 check is already in progress"
+    exit 1
+fi
+echo "1" > /data/running
+
 echo "$(date) : dockcheck starting" >> $CRON_LOG
 
 # load enviroment variables
@@ -67,6 +78,8 @@ if [ $? -eq 0 ]; then
 else 
     echo "$(date) : dockcheck encounterred errors." >> $CRON_LOG; 
 fi
+
+[ -f "/data/running" ] && rm /data/running
 
 [ "$DEBUG" = "true" ] && echo "DEBUG: $0 dockcheck done"
 true
