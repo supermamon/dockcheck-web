@@ -7,6 +7,7 @@ class UpdatesList {
 }
 
 class UpdatesBatch {
+  public $host;
   public $asof;
   public $errors;
   public $latest;
@@ -15,6 +16,7 @@ class UpdatesBatch {
 
 $batch = new UpdatesBatch;
 $batch->asof = time();
+$batch->host = php_uname('n');
 $batch->errors = new UpdatesList;
 $batch->latest = new UpdatesList;
 $batch->updates = new UpdatesList;
