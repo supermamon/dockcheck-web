@@ -9,7 +9,7 @@ A webpage showing available image updates for your running containers.
 ## Changes from upstream dockcheck-web
 * Data volume separate from the web app code
 * Optional check on startup via the `CHECK_ON_LAUNCH` environment variable
-* API endpoints to trigger update check and running state
+* API endpoints to trigger update check, get status, and list updates
 * Mobile-friendly styling using [Bulma](https://bulma.io/)
 * Leaner entrypoint script
 * Customizable page/window titles (`PAGE_TITLE`,`WINDOW_TITLE`)
@@ -49,7 +49,6 @@ services:
 | Variable            | Default   | Description                           |
 | ------------------- | --------- | ------------------------------------- |
 | NOTIFY              | false     | Enable notifications                  |
-| NOTIFY_DEBUG        |           | Enable notifications DEBUG mode. Be careful, your tokens and passwords might be visible in docker logs. | 
 | NOTIFY_URLS         |           | See Notifications section             |
 | EXCLUDE             |           | Exclude containers from update check  |
 | HTTP_PROXY          |           |                                       |
@@ -63,12 +62,12 @@ services:
 
 ### Volumes
 
-* `/data` : to store the list of udpates. Mount if you want to persists the results of the last check even after restarting the container.
+* `/data` : to store the list of updates. Mount if you want to persists the results of the last check even after restarting the container.
 
 ---
 
 ## Notifications
-This image use [apprise](https://github.com/caronc/apprise) for notifications
+This image uses [apprise](https://github.com/caronc/apprise) for notifications.
 
 
 Example notification setup  

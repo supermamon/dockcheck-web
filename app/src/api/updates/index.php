@@ -79,5 +79,4 @@ if ($batch->updates->count == 1 && $conupdate_match[0] == "") {
 $jsonStr = json_encode($batch);
 echo $jsonStr;
 
-
 ?>

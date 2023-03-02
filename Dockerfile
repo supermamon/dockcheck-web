@@ -23,11 +23,12 @@ RUN case ${ARCH} in \
 && curl -sL "https://github.com/regclient/regclient/releases/download/v0.4.5/regctl-linux-${os}" -o /usr/bin/regctl \
 && chmod +x /usr/bin/regctl
 
-ENV NOTIFY="" \
-NOTIFY_DEBUG="" \
+ENV NOTIFY="false" \
 NOTIFY_URLS="" \
 EXCLUDE="" \
-CHECK_ON_LAUNCH="true"
+CHECK_ON_LAUNCH="true" \
+DEBUG="false" \
+DCW_VERSION="1.1.0"
 
 COPY app /app
 COPY app/src /var/www/html/

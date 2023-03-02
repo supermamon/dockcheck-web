@@ -43,7 +43,7 @@
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);    
-    curl_setopt($curl, CURLOPT_URL, 'http://127.0.0.1/updates.php');
+    curl_setopt($curl, CURLOPT_URL, 'http://127.0.0.1/api/updates/');
     $res = curl_exec($curl);
     curl_close($curl);
 
@@ -138,9 +138,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const cfuButton = document.querySelector('#cfu')
   cfuButton.addEventListener('click', () => {
       setLoading(cfuButton);
-      fetch('/check.php').then( r => r.text()).then( t => console.log(t))
+      fetch('/api/check/').then( r => r.text()).then( t => console.log(t))
       intervalId = window.setInterval(() => {
-        fetch('/status.php')
+        fetch('/api/status/')
         .then( r => r.json())
         .then( j => {
             if (!j.running) {
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 1000);
     });
 
-    fetch('/status.php')
+    fetch('/api/status/')
     .then( r => r.json())
     .then( j => {
         if (j.running) {
