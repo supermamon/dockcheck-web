@@ -1,7 +1,8 @@
 FROM php:8.1-rc-apache
-LABEL maintainer="dev@supermamon.com"
-LABEL description="Image updates for your running containers"
-LABEL url="https://github.com/supermamon/dockcheck-web"
+LABEL org.opencontainers.image.authors="dev@supermamon.com"
+LABEL org.opencontainers.image.description="Image updates for your running containers"
+LABEL org.opencontainers.image.url="https://github.com/supermamon/dockcheck-web"
+LABEL org.opencontainers.image.source=https://github.com/supermamon/dockcheck-web
 
 ARG ARCH
 
@@ -31,7 +32,8 @@ NOTIFY_URLS="" \
 EXCLUDE="" \
 CHECK_ON_LAUNCH="true" \
 DEBUG="false" \
-SCHEDULE="0 8 * * *" 
+SCHEDULE="0 8 * * *" \
+DCW_VERSION="${DCW_VERSION}"
 
 COPY app /app
 COPY app/src /var/www/html/
