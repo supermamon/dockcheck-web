@@ -15,6 +15,7 @@ A webpage showing available image updates for your running containers.
 * Customizable page/window titles (`PAGE_TITLE`,`WINDOW_TITLE`)
 * Show last update date/time on page (`TZ`)
 * Troubleshooting options (`DEBUG`,`SILENCE_APACHE_LOGS`)
+* Custom scheduling (`SCHEDULE`)
 
 docker-compose.yml
 ```yml
@@ -31,13 +32,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/localtime:ro
     environment:
-      - NOTIFY=true # optional
-      - NOTIFY_URLS=discord://Dockcheck-web@xxxxx/xxxxxx #optional
-      - EXCLUDE=nginx,plex,prowlarr  #optional
-      - CHECK_ON_LAUNCH=true # optional
-      - PAGE_TITLE=Dockcheck # optional
-      - WINDOW_TITLE=Dockcheck #optional
-      - TZ=Europe/London #optional
+      - NOTIFY=true 
+      - NOTIFY_URLS=discord://Dockcheck-web@xxxxx/xxxxxx 
+      - EXCLUDE=nginx,plex,prowlarr 
+      - CHECK_ON_LAUNCH=true 
+      - PAGE_TITLE=Dockcheck 
+      - WINDOW_TITLE=Dockcheck
+      - TZ=Europe/London
+      - SCHEDULE=0 8 * * *
 ```
 
 ---
@@ -46,19 +48,20 @@ services:
 
 ### Environment Variables
 
-| Variable            | Default   | Description                           |
-| ------------------- | --------- | ------------------------------------- |
-| NOTIFY              | false     | Enable notifications                  |
-| NOTIFY_URLS         |           | See Notifications section             |
-| EXCLUDE             |           | Exclude containers from update check  |
-| HTTP_PROXY          |           |                                       |
-| HTTPS_PROXY         |           |                                       |
-| CHECK_ON_LAUNCH     | true      | Run `dockcheck` when container starts |
-| PAGE_TITLE          | Dockcheck | Custom web page title                 |
-| WINDOW_TITLE        | Dockcheck | Custom window title                   |
-| TZ                  | UTC       | Timezone to use for displaying date/time on the page |
-| DEBUG               |           | Set to 'true' to show debugging information in docker logs  |
-| SILENCE_APACHE_LOGS |           | Set to 'true' to hide Apache logs     |
+| Variable            | Default     | Description                           |
+| ------------------- | ----------- | ------------------------------------- |
+| NOTIFY              | false       | Enable notifications                  |
+| NOTIFY_URLS         |             | See Notifications section             |
+| EXCLUDE             |             | Exclude containers from update check  |
+| HTTP_PROXY          |             |                                       |
+| HTTPS_PROXY         |             |                                       |
+| CHECK_ON_LAUNCH     | true        | Run `dockcheck` when container starts |
+| PAGE_TITLE          | Dockcheck   | Custom web page title                 |
+| WINDOW_TITLE        | Dockcheck   | Custom window title                   |
+| TZ                  | UTC         | Timezone to use for displaying date/time on the page |
+| DEBUG               | fals        | Set to 'true' to show debugging information in docker logs  |
+| SILENCE_APACHE_LOGS | true        | Set to 'true' to hide Apache logs     |
+| SCHEDULE            | 0 8 *  *  * | cron-style schedule                   |
 
 ### Volumes
 
@@ -92,3 +95,30 @@ services:
       - NOTIFY_URLS="discord://Dockcheck-web@xxxxx/xxxxxx tgram://0123456789:RandomLettersAndNumbers-2morestuff-123456789"
   ...
 ```
+
+## Versions
+
+### 1.2.0
+
+* Custom scheduling
+* add `host` to the `/api/updates/` endpoint
+
+### 1.1.0
+
+* APIs on their own directory
+* Add `hostname` to `/api/updates/` endpoint
+* DCW_VERSION variable to get application version
+
+### 1.0.3
+
+* Troubleshooting options
+### 1.0.2
+
+* EXCLUDE configuration
+* Show last update check on page
+
+1.0.0
+
+* Mobile friendly layout
+* API endpoints
+* build & deploy script
