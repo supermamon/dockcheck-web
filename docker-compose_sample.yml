@@ -18,3 +18,6 @@ services:
       - WINDOW_TITLE=Dockcheck
       - CHECK_ON_LAUNCH=true
       - TZ=Europe/London
+      - DEBUG=false
+      - SILENCE_APACHE_LOGS=true
+      - SCHEDULE=0 0 * * *

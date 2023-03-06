@@ -23,20 +23,24 @@ RUN case ${ARCH} in \
 && curl -sL "https://github.com/regclient/regclient/releases/download/v0.4.5/regctl-linux-${os}" -o /usr/bin/regctl \
 && chmod +x /usr/bin/regctl
 
+ARG DCW_VERSION=0
+RUN echo "building version dockcheck-web v${DCW_VERSION}"
+
 ENV NOTIFY="false" \
 NOTIFY_URLS="" \
 EXCLUDE="" \
 CHECK_ON_LAUNCH="true" \
 DEBUG="false" \
-DCW_VERSION="1.1.0"
+SCHEDULE="0 8 * * *" 
 
 COPY app /app
 COPY app/src /var/www/html/
 
 VOLUME /data
 
-RUN cp /app/cron/dockcheck /etc/cron.daily/dockcheck \
-&& chmod +x /etc/cron.daily/dockcheck \
+RUN mkdir -p /etc/cron.custom/ \
+&& cp /app/cron/dockcheck /etc/cron.custom/dockcheck \
+&& chmod +x /etc/cron.custom/dockcheck \
 && rm -rf /etc/crontab \
 && cp /app/cron/crontab /etc/crontab \
 && chmod +x /app/watcher.sh \
